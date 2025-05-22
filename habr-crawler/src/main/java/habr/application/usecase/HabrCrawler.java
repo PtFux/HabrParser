@@ -88,6 +88,9 @@ public class HabrCrawler {
             }
 
             return EntityUtils.toString(response.getEntity(), "UTF-8");
+        } catch (Exception e) {
+            log.error("Error fetching URL: {} - {}", url, e.getMessage());
+            return "";
         }
     }
 }

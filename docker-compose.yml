@@ -1,10 +1,9 @@
-version: '3.8'
 
 services:
   habr-crawler:
     build:
       context: .
-      dockerfile: src/main/docker/Dockerfile
+      dockerfile: habr-crawler/src/main/docker/Dockerfile
 #    image: habr-crawler:latest
     container_name: habr-crawler
 #    restart: unless-stopped
@@ -23,7 +22,7 @@ services:
     networks:
       - habr-net
     env_file:
-      - src/main/.env.docker
+      - habr-crawler/src/main/.env.docker
 
 
   elasticsearch:
@@ -53,7 +52,7 @@ services:
       timeout: 10s
       retries: 3
     env_file:
-      - src/main/.env.docker
+      - habr-crawler/src/main/.env.docker
 
   kibana:
     image: kibana:8.11.1
@@ -74,9 +73,23 @@ services:
       timeout: 10s
       retries: 3
 
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: rabbitmq
+    ports:
+      - "5672:5672"       # порт для приложений
+      - "15672:15672"     # порт для UI
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+    networks:
+      - habr-net
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
 
 volumes:
   es_data:
+  rabbitmq_data:
 
 networks:
   habr-net:

@@ -20,8 +20,8 @@ public class Application implements CommandLineRunner {
     public void run(String... args) throws Exception {
         // Обязательно без /
         String baseUrl = "https://habr.com/ru/articles";
-        int startId = 1;
-        int endId = 10;
+        int startId = 100301;
+        int endId = 100309;
 
         generator.generateArticles(baseUrl, startId, endId);
 
