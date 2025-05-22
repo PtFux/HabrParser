@@ -2,9 +2,9 @@
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.example</groupId>
-  <artifactId>habr-crawler</artifactId>
+  <artifactId>saver</artifactId>
   <version>1.0-SNAPSHOT</version>
-  <name>Archetype - habr-crawler</name>
+  <name>Archetype - saver</name>
   <url>http://maven.apache.org</url>
 <parent>
   <groupId>com.habr</groupId>
@@ -29,7 +29,6 @@
   </dependency>
 
 
-
   <dependency>
     <groupId>com.fasterxml.jackson.datatype</groupId>
     <artifactId>jackson-datatype-jsr310</artifactId>
@@ -44,7 +43,7 @@
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-maven-plugin</artifactId>
         <configuration>
-          <mainClass>habr.Habr</mainClass>
+          <mainClass>saver.Saver</mainClass>
         </configuration>
         <executions>
           <execution>

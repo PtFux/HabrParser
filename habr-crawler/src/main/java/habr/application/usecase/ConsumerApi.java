@@ -1,5 +1,6 @@
 package habr.application.usecase;
 
+import habr.broker.ArticlePublisher;
 import habr.domain.repository.ArticleRepository;
 import habr.domain.service.persistence.elastic.ElasticSearchRepository;
 
@@ -21,9 +22,9 @@ public class ConsumerApi {
     private static final Logger log = LoggerFactory.getLogger(ConsumerApi.class);
 
     @Autowired
-    public ConsumerApi(ArticleRepository repository, HabrParser parser) {
+    public ConsumerApi(ArticleRepository repository, HabrParser parser, ArticlePublisher publisher) {
         this.repository = repository;
-        this.crawler = new HabrCrawler(new HabrParser(), repository);
+        this.crawler = new HabrCrawler(new HabrParser(), repository, publisher);
     }
 
     public void processInput(String url, String docId) {

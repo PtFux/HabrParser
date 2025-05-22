@@ -1,10 +1,14 @@
-package habr.broker;
+package saver.broker;
 
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import habr.domain.service.persistence.elastic.ElasticSearchRepository;
+
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.amqp.core.*;
@@ -19,11 +23,8 @@ import org.springframework.context.annotation.Configuration;
 public class RabbitConfig {
     private static final Logger logger = LoggerFactory.getLogger(RabbitConfig.class);
 
-    public static final String PROCESSED_ARTICLES_QUEUE = "processed.articles.queue";
-    public static final String ARTICLES_EXCHANGE = "articles.exchange";
-    public static final String PROCESSED_ARTICLES_EXCHANGE = "processed.articles.exchange";
-    public static final String PROCESSED_ROUTING_KEY_PATTERN = "processed.article.#";
-
+    public static final String ARTICLES_QUEUE = "processed.articles.queue";
+    public static final String ARTICLES_EXCHANGE = "processed.articles.exchange";
     public static final String ROUTING_KEY_PATTERN = "article.#";
 
 
@@ -40,23 +41,12 @@ public class RabbitConfig {
     }
 
 
-    @Bean
-    public MessageConverter messageConverter() {
-        ObjectMapper objectMapper = new ObjectMapper();
-        objectMapper.registerModule(new JavaTimeModule());
-        objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
-
-        return new Jackson2JsonMessageConverter(objectMapper);
-    }
 
     @Bean
     public org.springframework.amqp.rabbit.core.RabbitTemplate RabbitTemplate(ConnectionFactory connectionFactory) {
 
         org.springframework.amqp.rabbit.core.RabbitTemplate template = new org.springframework.amqp.rabbit.core.RabbitTemplate(connectionFactory);
         template.setMessageConverter(messageConverter());
-
-        // Установка таймаута ожидания подтверждения (60 секунд)
-        template.setReplyTimeout(60_000);
 
 
         template.setMandatory(true); // включаем возможность возврата
@@ -79,7 +69,7 @@ public class RabbitConfig {
 
     @Bean
     public Queue articlesQueue() {
-        return QueueBuilder.durable("articles.queue")
+        return QueueBuilder.durable(ARTICLES_QUEUE)
                 .maxLength(10000)                         // максимум 10 000 сообщений
                 .maxLengthBytes(10 * 1024 * 1024)          // максимум 10 МБ данных (опционально)
                 .overflow(QueueBuilder.Overflow.rejectPublish) // отклонить публикации, если переполнено
@@ -88,13 +78,11 @@ public class RabbitConfig {
     }
 
     @Bean
-    public Queue processedArticlesQueue() {
-        return QueueBuilder.durable(PROCESSED_ARTICLES_QUEUE)
-                .maxLength(10000)                         // максимум 10 000 сообщений
-                .maxLengthBytes(10 * 1024 * 1024)          // максимум 10 МБ данных (опционально)
-                .overflow(QueueBuilder.Overflow.rejectPublish) // отклонить публикации, если переполнено
-                .ttl(600_000)                              // TTL: 10 минут (опционально)
-                .build();
-    }
+    public MessageConverter messageConverter() {
+        ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.registerModule(new JavaTimeModule());
+        objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
 
+        return new Jackson2JsonMessageConverter(objectMapper);
+    }
 }

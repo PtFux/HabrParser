@@ -2,6 +2,8 @@ package habr.application.usecase;
 
 // HabrCrawler.java - Основной модуль краулера - скачивает html
 import habr.application.dto.Article;
+import habr.application.dto.ArticlePayload;
+import habr.broker.ArticlePublisher;
 import habr.domain.repository.ArticleRepository;
 import habr.application.usecase.HabrParser;
 
@@ -30,11 +32,13 @@ public class HabrCrawler {
     private final CloseableHttpClient httpClient;
     private final HabrParser parser;
     private final ArticleRepository repository;
+    private final ArticlePublisher publisher;
 
 
-    public HabrCrawler(HabrParser parser, ArticleRepository repository) {
+    public HabrCrawler(HabrParser parser, ArticleRepository repository, ArticlePublisher publisher) {
         this.parser = parser;
         this.repository = repository;
+        this.publisher = publisher;
 
         this.httpClient = HttpClients.custom()
                 .setRedirectStrategy(new LaxRedirectStrategy()) // Следование за редиректами
@@ -64,7 +68,11 @@ public class HabrCrawler {
             // 2. Парсинг
             Article article = parser.parse(html, url, docId);
             // 3. Сохранение
-            repository.save(article);
+
+            // Отправка во вторую очередь
+            publisher.publishArticle(toPayload(article));
+
+//            repository.save(article);
 
             log.info("Successfully processed article: {}", article.getTitle());
         } catch (RuntimeException e) {
@@ -92,5 +100,16 @@ public class HabrCrawler {
             log.error("Error fetching URL: {} - {}", url, e.getMessage());
             return "";
         }
+    }
+
+    public static ArticlePayload toPayload(Article article) {
+        ArticlePayload payload = new ArticlePayload();
+        payload.setDocId(article.getDocId());
+        payload.setTitle(article.getTitle());
+        payload.setAuthor(article.getAuthor());
+        payload.setUrl(article.getLink());
+        payload.setContent(article.getText());
+        payload.setPublishDate(article.getPublishDate());
+        return payload;
     }
 }

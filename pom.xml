@@ -19,6 +19,8 @@
     <modules>
         <module>scheduler</module>
         <module>habr-crawler</module>
+        <module>saver</module>
+
 
         <!--        <module>habr-checker</module>-->
     </modules>

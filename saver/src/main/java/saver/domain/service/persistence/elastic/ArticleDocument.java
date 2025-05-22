@@ -1,14 +1,12 @@
-package habr.domain.service.persistence.elastic;
+package saver.domain.service.persistence.elastic;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
-
 import org.springframework.data.annotation.Id;
 import org.springframework.data.elasticsearch.annotations.DateFormat;
 import org.springframework.data.elasticsearch.annotations.Document;
 import org.springframework.data.elasticsearch.annotations.Field;
 import org.springframework.data.elasticsearch.annotations.FieldType;
-import org.springframework.data.elasticsearch.repository.ElasticsearchRepository;
 
 import java.time.LocalDateTime;
 
